@@ -1,8 +1,10 @@
 # depslib dependency file v1.0
-1488203232 source:/home/minty/Betriebssysteme/Beispiel_1/MyFind/MyFind.c
+1488224456 source:/home/minty/Betriebssysteme/Beispiel_1/MyFind/MyFind.c
 	<stdio.h>
 	<stdlib.h>
 	<linux/types.h>
 	<dirent.h>
 	<string.h>
+	<unistd.h>
+	<ctype.h>
 
