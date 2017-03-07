@@ -5,6 +5,9 @@
 #include <string.h>
 #include <unistd.h>
 #include <ctype.h>
+#include <error.h>
+
+
 
 void strupr(char *sPtr)
 {
@@ -12,7 +15,47 @@ void strupr(char *sPtr)
     *sPtr = toupper(*sPtr);
 }
 
-int GoThrough(const char *source, const int level)
+/*int GoThrough(const char *source, const int level)
+{
+	DIR *dir;
+	struct dirent *entry;
+
+	if (!(dir = opendir(source)))
+		return -1;
+	if (!(entry = readdir(dir)))
+		return -2;
+
+	if (level == 0)
+		printf("%s\n", source);
+
+	do
+	{
+		if (entry->d_type == 4 && (strcmp(entry->d_name, ".") == 0))
+			continue;
+
+		if (entry->d_type == 4 && (strcmp(entry->d_name, "..") == 0))
+			continue;
+
+
+		if (entry->d_type == 4 && !(strcmp(entry->d_name, ".") == 0))
+		{
+			char *result = malloc(strlen(source) + strlen(entry->d_name) + 2);
+			strcpy(result, source);
+			strcat(result, "/");
+			strcat(result, entry->d_name);
+			GoThrough(result, level + 1);
+		}
+		printf("%s/%s\n", source, entry->d_name);
+	} while ((entry = readdir(dir)) != NULL);
+
+	closedir(dir);
+	return 0;
+}
+*/
+
+
+
+int GoThroughDir(const char *source, const int level)
 {
     DIR *dir;
     struct dirent *entry;
@@ -40,16 +83,18 @@ int GoThrough(const char *source, const int level)
             strcpy(result, source);
             strcat(result, "/");
             strcat(result,entry->d_name);
-            GoThrough(result, level + 1);
+            GoThroughDir(result, level + 1);
         }
         printf("%s/%s\n", source, entry->d_name);
     }while((entry = readdir(dir)) != NULL);
 
     closedir(dir);
-    return 0;
+	return 0;
 }
 
-int do_dir(const char * dir_name, const char * const * parms)
+
+
+void do_dir(const char * dir_name, const char * const * parms)
 {
     int i = 2;
 
@@ -59,7 +104,7 @@ int do_dir(const char * dir_name, const char * const * parms)
     {
         if(strcmp(parms[i],"-print") == 0)
         {
-            GoThrough(dir_name,0);
+            GoThroughDir(dir_name,0);
         }
         else
         {
@@ -68,7 +113,66 @@ int do_dir(const char * dir_name, const char * const * parms)
         i++;
     }
 
-    return 0;
+    
+}
+
+
+int GoThroughFile(const char *source, const char *pattern)
+{
+	DIR *dir;
+	struct dirent *entry;
+
+	if (!(dir = opendir(source)))
+		return -1;
+	if (!(entry = readdir(dir)))
+		return -2;
+
+	do
+	{
+		if((entry->d_type == DT_REG) && (strcmp(entry->d_name, pattern)==0))
+			printf("%s\n", entry->d_name);
+	} while ((entry = readdir(dir)) != NULL);
+
+	closedir(dir);
+	return 0;
+}
+
+
+int GoThrough(const char *source, const int level)
+{
+	DIR *dir;
+	struct dirent *entry;
+
+	if (!(dir = opendir(source)))
+		return -1;
+	if (!(entry = readdir(dir)))
+		return -2;
+
+	if (level == 0)
+		printf("%s\n", source);
+
+	do
+	{
+		if (entry->d_type == 4 && (strcmp(entry->d_name, ".") == 0))
+			continue;
+
+		if (entry->d_type == 4 && (strcmp(entry->d_name, "..") == 0))
+			continue;
+
+
+		if (entry->d_type == 4 && !(strcmp(entry->d_name, ".") == 0))
+		{
+			char *result = malloc(strlen(source) + strlen(entry->d_name) + 2);
+			strcpy(result, source);
+			strcat(result, "/");
+			strcat(result, entry->d_name);
+			GoThroughDir(result, level + 1);
+		}
+		printf("%s/%s\n", source, entry->d_name);
+	} while ((entry = readdir(dir)) != NULL);
+
+	closedir(dir);
+	return 0;
 }
 
 
@@ -77,17 +181,17 @@ int main(int argc, char *argv[])
     if(argc == 1)
     {
         GoThrough(".",0);
-        printf("%s",argv[0]);
     }
     else if(argc == 2)
     {
-        GoThrough(argv[1],0);
-        printf("%s",argv[0]);
+        GoThroughFile(".",argv[1]);
     }
     else if(argc > 2)
     {
         do_dir(argv[1], (const char**)argv);
     }
+	
+	
 
     return 0;
 }
