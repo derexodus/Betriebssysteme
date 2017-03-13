@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <linux/types.h>
@@ -7,7 +8,7 @@
 #include <ctype.h>
 #include <error.h>
 
-
+/*MY find from LOUIS, Kranthi, Pawel*/
 
 void strupr(char *sPtr)
 {
@@ -115,9 +116,10 @@ void do_dir(const char * dir_name, const char * const * parms)
 	}
 	else
         {
-            printf("Unknown parameter!\n");
+	    
+            printf("Unknown parameter\n");
         }
-     //   i++;
+       // i++;
    // }
 
     
